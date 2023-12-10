@@ -1,0 +1,13 @@
+.history
+node_modules
+dist
+
+.env
+.env.staging
+.env.production
+
+package-lock.json
+
+prisma/migrations
+prisma/dev.db
+prisma/dev.db-journal
