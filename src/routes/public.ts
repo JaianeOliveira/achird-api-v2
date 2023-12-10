@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import docsV2 from '@/docs/swagger.json';
+import { authController } from './setup';
 export const publicRouter = Router();
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 publicRouter.use('/api-docs', swaggerUi.serve, swaggerUi.setup(docsV2));
 
@@ -11,3 +15,22 @@ publicRouter.get('/', (_, res) => {
 		docs: '/v2/api-docs',
 	});
 });
+
+publicRouter.post('/auth/login', authController.login.bind(authController));
+publicRouter.post('/auth/register', authController.register.bind(authController));
+
+publicRouter.get('/auth/code', (req, res) => {
+	const code = req.query.code;
+
+	if (code) {
+		res.json({ code });
+	} else {
+		const authUrl = `https://github.com/login/oauth/authorize?client_id=${
+			process.env.GITHUB_CLIENT_ID
+		}&redirect_uri=${req.protocol}://${req.headers.host || 'localhost'}/v2/auth/code&scope=user`;
+		console.log(authUrl);
+		res.redirect(authUrl);
+	}
+});
+
+publicRouter.get('/users');
