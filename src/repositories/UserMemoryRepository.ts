@@ -27,21 +27,17 @@ export class UserMemoryRepository implements IUserRepository {
 	}
 
 	async exists(queries: FindUserQueries): Promise<boolean> {
-		return !!this.users.find((user) => {
-			return (
-				user.email === queries.email &&
-				user.github_user === queries.github_user &&
-				user.github_id === queries.github_id
-			);
-		});
+		return !!(await this.find(queries));
 	}
 
-	async find(queries: FindUserQueries & { id: string; slug: string }): Promise<IUser> {
+	async find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<IUser> {
 		return this.users.find((user) => {
 			return (
-				user.email === queries.email &&
-				user.github_user === queries.github_user &&
-				user.github_id === queries.github_id
+				user.email === queries.email ||
+				user.github_user === queries.github_user ||
+				user.github_id === queries.github_id ||
+				user._id === queries.id ||
+				user.slug === queries.slug
 			);
 		})!;
 	}

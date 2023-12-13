@@ -14,7 +14,6 @@ export class AuthController implements IAuthController {
 	async register(req: Request, res: Response) {
 		const code = req.query.code as string;
 		const referer = (req.headers.referer as string) || (process.env.REDIRECT_URI as string);
-		console.log('controller', code, referer);
 		handleErrors(req, res, () => this.authService.register(code, referer));
 	}
 }

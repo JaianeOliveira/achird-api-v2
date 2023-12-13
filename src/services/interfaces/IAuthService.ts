@@ -1,5 +1,11 @@
 export type AuthResponse = {
-	access_token: string;
+	token: string;
+	user: {
+		github_id: number;
+		github_user: string;
+		email: string;
+		name: string;
+	};
 };
 
 export interface IAuthService {

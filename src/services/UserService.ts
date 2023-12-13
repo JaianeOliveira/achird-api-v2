@@ -32,7 +32,7 @@ export class UserService implements IUserService {
 			social_accounts: data.social_accounts || [],
 			created_at: date,
 			updated_at: date,
-			slug: data.github_user,
+			slug: data.github_user.toLowerCase(),
 		};
 
 		await this.userRepository.create(newUserData);
@@ -56,7 +56,7 @@ export class UserService implements IUserService {
 	}
 
 	async exists(queries: FindUserQueries) {
-		return await this.userRepository.exists(queries);
+		return await this.userRepository.exists({ ...queries });
 	}
 
 	async getUser(github_user: string): Promise<any> {

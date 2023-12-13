@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import docsV2 from '@/docs/swagger.json';
-import { authController } from './setup';
+import { authController, userController } from './setup';
 export const publicRouter = Router();
 import dotenv from 'dotenv';
 
@@ -28,9 +28,8 @@ publicRouter.get('/auth/code', (req, res) => {
 		const authUrl = `https://github.com/login/oauth/authorize?client_id=${
 			process.env.GITHUB_CLIENT_ID
 		}&redirect_uri=${req.protocol}://${req.headers.host || 'localhost'}/v2/auth/code&scope=user`;
-		console.log(authUrl);
 		res.redirect(authUrl);
 	}
 });
 
-publicRouter.get('/users');
+publicRouter.get('/users', userController.list.bind(userController));

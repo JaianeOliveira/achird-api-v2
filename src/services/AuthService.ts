@@ -2,11 +2,13 @@ import { BadRequestException, ConflictException, NotFoundException } from '@/uti
 import { IAuthService } from './interfaces/IAuthService';
 import { IGithubService } from './interfaces/IGithubService';
 import { IUserService } from './interfaces/IUserService';
+import { IJwtService } from './interfaces/IJWTService';
 
 export class AuthService implements IAuthService {
 	constructor(
 		private githubService: IGithubService,
 		private userService: IUserService,
+		private jwtService: IJwtService,
 	) {}
 	async login(code: string, referer: string) {
 		if (!code) {
@@ -17,40 +19,56 @@ export class AuthService implements IAuthService {
 
 		const userData = await this.userService.getUserAuthenticatedData(access_token);
 
+		const data = {
+			github_id: userData.user.id,
+			github_user: userData.user.login,
+			email: userData.user.email,
+			social_accounts: userData.social_accounts,
+		};
+
 		const userExists = await this.userService.exists({
-			email: userData.email,
-			github_user: userData.github_user,
-			github_id: userData.github_id,
+			email: data.email,
+			github_user: data.github_user,
+			github_id: data.github_id,
 		});
 
 		if (!userExists) {
 			throw new NotFoundException('User not found');
 		} else {
-			await this.userService.update(userData.github_id, {
-				email: userData.email,
-				github_user: userData.github_user,
-				social_accounts: userData.social_accounts,
+			await this.userService.update(data.github_id, {
+				email: data.email,
+				github_user: data.github_user,
+				social_accounts: data.social_accounts,
 			});
-			return { access_token };
+			const token = this.jwtService.sign({
+				github_access_token: access_token,
+				github_user: data.github_user,
+				github_id: data.github_id,
+			});
+			return {
+				token,
+				user: {
+					github_id: data.github_id,
+					github_user: data.github_user,
+					email: data.email,
+					name: userData.user.name,
+				},
+			};
 		}
 	}
 	async register(code: string, referer: string) {
-		console.log('service-register');
 		if (!code) {
 			throw new BadRequestException('Code is required');
 		}
 
 		const access_token = await this.githubService.getAccessTokenByCode(code, referer);
 
-		console.log('service-register-access_token', access_token);
-
-		console.log(access_token);
 		const userData = await this.userService.getUserAuthenticatedData(access_token);
 
 		const userExists = await this.userService.exists({
-			email: userData.email,
-			github_user: userData.github_user,
-			github_id: userData.github_id,
+			email: userData.user.email,
+			github_user: userData.user.login,
+			github_id: userData.user.id,
 		});
 
 		if (userExists) {
@@ -58,14 +76,28 @@ export class AuthService implements IAuthService {
 		}
 
 		const newUserData = {
-			email: userData.email,
-			github_id: userData.github_id,
-			github_user: userData.github_user,
+			email: userData.user.email,
+			github_id: userData.user.id,
+			github_user: userData.user.login,
 			social_accounts: userData.social_accounts,
 		};
 
 		await this.userService.create(newUserData);
 
-		return { access_token };
+		const token = this.jwtService.sign({
+			github_access_token: access_token,
+			github_user: userData.github_user,
+			github_id: userData.github_id,
+		});
+
+		return {
+			token,
+			user: {
+				github_id: userData.user.id,
+				github_user: userData.user.login,
+				email: userData.user.email,
+				name: userData.user.name,
+			},
+		};
 	}
 }

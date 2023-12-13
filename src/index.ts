@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 
 import { publicRouter } from '@/routes/public';
+import morgan from 'morgan';
+import { privateRoutes } from './routes/private';
 
 dotenv.config();
 
@@ -13,9 +15,11 @@ const app = express();
 // middlewares
 app.use(json());
 app.use(cors());
+app.use(morgan('dev'));
 
 // routes
 app.use('/v2', publicRouter);
+app.use('/v2', privateRoutes);
 app.get('/', (req, res) => {
 	res.redirect('/v2');
 });

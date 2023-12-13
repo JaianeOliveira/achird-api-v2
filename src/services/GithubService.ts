@@ -56,8 +56,8 @@ export class GithubService implements IGithubService {
 		const [user, social] = await Promise.all(promises);
 
 		return {
-			...user,
-			...social,
+			user: user.data,
+			social_accounts: social.data,
 		};
 	}
 
