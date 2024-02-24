@@ -16,7 +16,7 @@ export type CreateUserDTO = {
 	social_accounts?: { provider: string; url: string }[];
 };
 export interface IUserService {
-	getUserAuthenticatedData(token: string): Promise<any>;
+	getUserAuthenticatedData(bearer_token: string): Promise<any>;
 	exists(queries: FindUserQueries): Promise<boolean>;
 	update(github_id: number, data: UpdateUserDTO): Promise<void>;
 	create(data: CreateUserDTO): Promise<void>;

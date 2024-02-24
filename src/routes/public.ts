@@ -33,7 +33,9 @@ publicRouter.get('/auth/code', (req, res) => {
 	} else {
 		const authUrl = `https://github.com/login/oauth/authorize?client_id=${
 			process.env.GITHUB_CLIENT_ID
-		}&redirect_uri=${req.protocol}://${req.headers.host || 'localhost'}/v2/auth/code&scope=user`;
+		}&redirect_uri=${req.protocol}://${
+			req.headers.host || 'localhost'
+		}/api/v2/auth/code&scope=user`;
 		res.redirect(authUrl);
 	}
 });

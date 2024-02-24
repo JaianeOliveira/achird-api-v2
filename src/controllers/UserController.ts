@@ -12,7 +12,7 @@ export class UserController implements IUserController {
 		handleErrors(req, res, () => this.userService.getUser(slug));
 	}
 
-	async getUser(req: Request, res: Response): Promise<void> {
+	async getUserAuthenticatedData(req: Request, res: Response): Promise<void> {
 		const token = req.headers.authorization as string;
 
 		handleErrors(req, res, () => this.userService.getUserAuthenticatedData(token));

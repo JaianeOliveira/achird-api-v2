@@ -18,11 +18,9 @@ app.use(cors());
 app.use(morgan('dev'));
 
 // routes
+
 app.use('/api/v2', publicRouter);
 app.use('/api/v2', privateRoutes);
-app.get('/*', (req, res) => {
-	res.redirect('/api/v2');
-});
 
 app.listen(port, () => {
 	console.log(
