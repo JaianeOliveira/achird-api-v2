@@ -36,6 +36,9 @@ export class UserService implements IUserService {
 			created_at: date,
 			updated_at: date,
 			slug: data.github_user.toLowerCase(),
+			theme: 'default',
+			page_is_public: false,
+			profissional_experience: [],
 		};
 
 		await this.userRepository.create(newUserData);
@@ -82,17 +85,14 @@ export class UserService implements IUserService {
 		const utilData = {
 			slug: database_data.slug,
 			email: database_data.email,
-			// TO ADD: page_is_public: database_data.page_is_public,
-			page_is_public: true,
+			page_is_public: database_data.page_is_public,
 			social_accounts: database_data.social_accounts,
 			github_user: database_data.github_user,
 			avatar_url: github_data.user.avatar_url,
 			// repositories: TO TO
 			repositories: [],
-			// theme: TO TO
-			theme: 'default',
-			// profissional_experience: TO DO
-			profissional_experience: [],
+			theme: database_data.theme,
+			profissional_experience: database_data.profissional_experience,
 		};
 
 		return utilData;

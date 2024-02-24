@@ -65,7 +65,7 @@ export class AuthService implements IAuthService {
 
 		const access_token = await this.githubService.getAccessTokenByCode(code, referer);
 
-		const userData = await this.userService.getUserAuthenticatedData(access_token);
+		const userData = await this.githubService.getAuthenticatedUser(access_token);
 
 		const userExists = await this.userService.exists({
 			email: userData.user.email,
