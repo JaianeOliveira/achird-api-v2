@@ -3,6 +3,7 @@ import {
 	CreateUserDTO,
 	FindUserQueries,
 	IUserService,
+	PublicProfileData,
 	UpdateUserDTO,
 } from './interfaces/IUserService';
 import { IGithubService } from './interfaces/IGithubService';
@@ -101,13 +102,20 @@ export class UserService implements IUserService {
 		return await this.userRepository.exists({ ...queries });
 	}
 
-	async getUser(slug: string): Promise<any> {
+	async getPublicProfile(slug: string): Promise<PublicProfileData> {
 		const databaseUser = await this.userRepository.find({ slug });
 		const githubUser = await this.githubService.getUser(databaseUser.github_user);
 
-		const data = {
-			...databaseUser,
-			...githubUser,
+		const data: PublicProfileData = {
+			name: githubUser.name,
+			email: databaseUser.email,
+			avatar_url: githubUser.avatar_url,
+			bio: githubUser.bio,
+			github_user: databaseUser.github_user,
+			github_profile_url: githubUser.html_url,
+			social_accounts: databaseUser.social_accounts,
+			profissional_experience: [],
+			repositories: [],
 		};
 
 		return data;

@@ -9,7 +9,7 @@ export class UserController implements IUserController {
 	async getPageData(req: Request, res: Response): Promise<void> {
 		const slug = req.query.slug as string;
 
-		handleErrors(req, res, () => this.userService.getUser(slug));
+		handleErrors(req, res, () => this.userService.getPublicProfile(slug));
 	}
 
 	async getUserAuthenticatedData(req: Request, res: Response): Promise<void> {
