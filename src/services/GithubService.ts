@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { IGithubService } from './interfaces/IGithubService';
+import { IGithubService, Repository } from './interfaces/IGithubService';
 import { queryStringToObject } from '@/utils/QueryString';
 import { Exception } from '@/utils/Exceptions';
 
@@ -65,5 +65,28 @@ export class GithubService implements IGithubService {
 		const { data } = await this.axios.get(`https://api.github.com/users/${github_user}`);
 
 		return data;
+	}
+
+	async getRepositories(github_user: string): Promise<Repository[]> {
+		const { data } = await this.axios.get(`https://api.github.com/users/${github_user}/repos`);
+
+		const filteredRepos = data.filter(
+			(repo: any) => repo.topics.includes('frontend') || repo.topics.includes('view-on-achird'),
+		);
+
+		return filteredRepos.map((repo: any) => ({
+			name: repo.name,
+			url: repo.html_url,
+			readme: `${repo.url}/readme`,
+			topics: repo.topics,
+			language: repo.language,
+			license: {
+				key: repo.license?.key,
+				name: repo.license?.name,
+				url: repo.license?.url,
+			},
+			description: repo.description,
+			homepage: repo.homepage,
+		}));
 	}
 }

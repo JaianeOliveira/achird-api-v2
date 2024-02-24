@@ -79,8 +79,9 @@ export class UserService implements IUserService {
 		const promises = [
 			this.userRepository.find({ github_user }),
 			this.githubService.getAuthenticatedUser(github_access_token),
+			this.githubService.getRepositories(github_user),
 		];
-		const [database_data, github_data] = await Promise.all(promises);
+		const [database_data, github_data, repositories] = await Promise.all(promises);
 
 		const utilData = {
 			slug: database_data.slug,
@@ -89,8 +90,7 @@ export class UserService implements IUserService {
 			social_accounts: database_data.social_accounts,
 			github_user: database_data.github_user,
 			avatar_url: github_data.user.avatar_url,
-			// repositories: TO TO
-			repositories: [],
+			repositories,
 			theme: database_data.theme,
 			profissional_experience: database_data.profissional_experience,
 		};
@@ -105,6 +105,7 @@ export class UserService implements IUserService {
 	async getPublicProfile(slug: string): Promise<PublicProfileData> {
 		const databaseUser = await this.userRepository.find({ slug });
 		const githubUser = await this.githubService.getUser(databaseUser.github_user);
+		const repos = await this.githubService.getRepositories(databaseUser.github_user);
 
 		const data: PublicProfileData = {
 			name: githubUser.name,
@@ -115,7 +116,7 @@ export class UserService implements IUserService {
 			github_profile_url: githubUser.html_url,
 			social_accounts: databaseUser.social_accounts,
 			profissional_experience: [],
-			repositories: [],
+			repositories: repos,
 		};
 
 		return data;
