@@ -20,6 +20,7 @@ export interface IUserService {
 	exists(queries: FindUserQueries): Promise<boolean>;
 	update(github_id: number, data: UpdateUserDTO): Promise<void>;
 	create(data: CreateUserDTO): Promise<void>;
+	delete(github_id: number): Promise<void>;
 	getUser(github_user: string): Promise<any>;
 	list(): Promise<any>;
 }

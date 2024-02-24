@@ -10,9 +10,10 @@ export class AuthService implements IAuthService {
 		private userService: IUserService,
 		private jwtService: IJwtService,
 	) {}
+
 	async login(code: string, referer: string) {
 		if (!code) {
-			throw new BadRequestException('Code is required');
+			throw new BadRequestException('Código não encontrado', 'Code is required');
 		}
 
 		const access_token = await this.githubService.getAccessTokenByCode(code, referer);
@@ -33,7 +34,7 @@ export class AuthService implements IAuthService {
 		});
 
 		if (!userExists) {
-			throw new NotFoundException('User not found');
+			throw new NotFoundException('Usuário não encontrado', 'User not found');
 		} else {
 			await this.userService.update(data.github_id, {
 				email: data.email,
@@ -58,7 +59,7 @@ export class AuthService implements IAuthService {
 	}
 	async register(code: string, referer: string) {
 		if (!code) {
-			throw new BadRequestException('Code is required');
+			throw new BadRequestException('Código não encontrado', 'Code is required');
 		}
 
 		const access_token = await this.githubService.getAccessTokenByCode(code, referer);
@@ -72,7 +73,7 @@ export class AuthService implements IAuthService {
 		});
 
 		if (userExists) {
-			throw new ConflictException('User already exists');
+			throw new ConflictException('Este usuário já está registrado', 'User already exists');
 		}
 
 		const newUserData = {

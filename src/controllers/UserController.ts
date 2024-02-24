@@ -7,9 +7,9 @@ export class UserController implements IUserController {
 	constructor(private userService: IUserService) {}
 
 	async getPageData(req: Request, res: Response): Promise<void> {
-		const github_user = req.query.github_user as string;
+		const slug = req.query.slug as string;
 
-		handleErrors(req, res, () => this.userService.getUser(github_user));
+		handleErrors(req, res, () => this.userService.getUser(slug));
 	}
 
 	async getUser(req: Request, res: Response): Promise<void> {
@@ -18,12 +18,16 @@ export class UserController implements IUserController {
 		handleErrors(req, res, () => this.userService.getUserAuthenticatedData(token));
 	}
 
-	async updateUser(): Promise<void> {
-		throw new Error('Method not implemented.');
+	async updateUser(req: Request, res: Response): Promise<void> {
+		const github_id = Number(req.query.github_id);
+
+		handleErrors(req, res, () => this.userService.update(github_id, req.body));
 	}
 
-	async deleteUser(): Promise<void> {
-		throw new Error('Method not implemented.');
+	async deleteUser(req: Request, res: Response): Promise<void> {
+		const github_id = Number(req.query.github_id);
+
+		handleErrors(req, res, () => this.userService.delete(github_id));
 	}
 
 	async list(req: Request, res: Response) {

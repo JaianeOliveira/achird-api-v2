@@ -13,7 +13,7 @@ export class AuthMiddleware {
 				throw new UnauthorizedException('Token not found');
 			}
 
-			const tokenIsValid = await this.jwtService.verify(token);
+			const tokenIsValid = await this.jwtService.verify(token.split(' ')[1]);
 
 			if (!tokenIsValid) {
 				throw new UnauthorizedException('Token invalid');

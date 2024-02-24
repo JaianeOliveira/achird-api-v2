@@ -12,7 +12,13 @@ publicRouter.use('/api-docs', swaggerUi.serve, swaggerUi.setup(docsV2));
 publicRouter.get('/', (_, res) => {
 	res.send({
 		message: `[${process.env.APP_NAME}] Welcome to V2!`,
-		docs: '/v2/api-docs',
+		docs: '/api/v2/api-docs',
+	});
+});
+
+publicRouter.get('/ping', (_, res) => {
+	res.send({
+		message: `[${process.env.APP_NAME}] Ping`,
 	});
 });
 
@@ -33,3 +39,4 @@ publicRouter.get('/auth/code', (req, res) => {
 });
 
 publicRouter.get('/users', userController.list.bind(userController));
+publicRouter.get('/user/:slug', userController.getPageData.bind(userController));

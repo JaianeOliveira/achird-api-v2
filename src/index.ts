@@ -18,12 +18,14 @@ app.use(cors());
 app.use(morgan('dev'));
 
 // routes
-app.use('/v2', publicRouter);
-app.use('/v2', privateRoutes);
-app.get('/', (req, res) => {
-	res.redirect('/v2');
+app.use('/api/v2', publicRouter);
+app.use('/api/v2', privateRoutes);
+app.get('/*', (req, res) => {
+	res.redirect('/api/v2');
 });
 
 app.listen(port, () => {
-	console.log(`[${process.env.APP_NAME}] Server is running on port http://localhost:${port}`);
+	console.log(
+		`[${process.env.APP_NAME}] Server is running on port http://localhost:${port} \n Access http://localhost:${port}/api/v2 to see the documentation`,
+	);
 });

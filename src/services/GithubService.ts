@@ -41,6 +41,7 @@ export class GithubService implements IGithubService {
 	}
 
 	async getAuthenticatedUser(token: string) {
+		console.log(token);
 		const promises = [
 			this.axios.get('https://api.github.com/user', {
 				headers: {

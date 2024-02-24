@@ -7,11 +7,29 @@ export async function handleErrors(req: Request, res: Response, callback: () => 
 		res.json(returnData);
 	} catch (err) {
 		if (err instanceof Exception) {
-			res.status(err.statusCode).json({ message: err.message, statusCode: err.statusCode });
+			res.status(err.statusCode).json({
+				message: err.message,
+				statusCode: err.statusCode,
+				context: err.context,
+				links: err.links,
+				timestamp: err.timestamp,
+			});
 		} else if (err instanceof Error) {
-			res.status(500).json({ message: err.message, statusCode: 500 });
+			res.status(500).json({
+				message: err.message,
+				statusCode: 500,
+				context: '',
+				links: [],
+				timestamp: new Date().toISOString(),
+			});
 		} else {
-			res.status(500).json({ message: 'Internal server error', statusCode: 500 });
+			res.status(500).json({
+				message: 'Internal server error',
+				statusCode: 500,
+				context: '',
+				links: [],
+				timestamp: new Date().toISOString(),
+			});
 		}
 	}
 }
