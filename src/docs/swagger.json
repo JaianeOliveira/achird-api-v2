@@ -1,14 +1,501 @@
 {
-	"openapi": "3.0.0",
+	"openapi": "3.1.0",
 	"info": {
 		"title": "Achird API",
-		"description": "API do projeto Achird",
-		"version": "2.0.0"
+		"summary": "API do projeto Achird",
+		"version": "2.0.0",
+		"contact": {
+			"name": "API Support",
+			"email": "jaianeoliveira.dev@gmail.com"
+		},
+		"license": {
+			"name": "GNU GPL v3.0",
+			"url": "https://github.com/JaianeOliveira/achird-api-v2/blob/develop/LICENSE"
+		}
 	},
 	"servers": [
 		{
-			"url": "http://localhost:3333",
-			"description": "Servidor de desenvolvimento"
+			"url": "https://achird-api-v2.onrender.com/api/v2",
+			"description": "The Production API Server"
+		},
+		{
+			"url": "https://{host}:{port}/api/v2",
+			"description": "The Developer API server",
+			"variables": {
+				"port": {
+					"default": "3333"
+				},
+				"host": {
+					"default": "127.0.0.1",
+					"description": "The host name of the server"
+				}
+			}
 		}
-	]
+	],
+	"components": {
+		"schemas": {
+			"Error": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"statusCode": {
+						"type": "integer"
+					},
+					"links": {
+						"type": "array"
+					},
+					"timestamp": {
+						"type": "string"
+					}
+				}
+			},
+			"Repository": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"url": {
+						"type": "string"
+					},
+					"readme": {
+						"type": "string"
+					},
+					"topics": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"language": {
+						"type": "string"
+					},
+					"license": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"key": {
+								"type": "string"
+							},
+							"url": {
+								"type": "string"
+							}
+						}
+					},
+					"description": {
+						"type": "string"
+					},
+					"homepage": {
+						"type": "string"
+					}
+				}
+			},
+			"UserAuthenticatedData": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"slug": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"page_is_public": {
+						"type": "boolean"
+					},
+					"social_accounts": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"provider": {
+									"type": "string"
+								},
+								"url": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"github_user": {
+						"type": "string"
+					},
+					"avatar_url": {
+						"type": "string"
+					},
+					"repositories": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"$ref": "#/components/schemas/Repository"
+						}
+					},
+					"theme": {
+						"type": "string"
+					},
+					"professional_experience": {
+						"type": "array"
+					}
+				}
+			},
+			"PublicPageData": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"avatar_url": {
+						"type": "string"
+					},
+					"bio": {
+						"type": "string"
+					},
+					"github_user": {
+						"type": "string"
+					},
+					"github_id": {
+						"type": "number"
+					},
+					"social_accounts": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"provider": {
+									"type": "string"
+								},
+								"url": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"professional_experience": {
+						"type": "array"
+					},
+					"repositories": {
+						"type": "array",
+						"$ref": "#/components/schemas/Repository"
+					}
+				}
+			}
+		},
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
+	},
+	"paths": {
+		"/": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "API is running!",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "[Achird API] Welcome to V2!"
+										},
+										"docs": {
+											"type": "string",
+											"example": "/api/v2/api-docs"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/ping": {
+			"get": {
+				"summary": "Ping!",
+				"responses": {
+					"200": {
+						"description": "API was pinged!",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Pong!"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api-docs": {
+			"get": {
+				"tags": ["Docs"],
+				"summary": "Documentação da API"
+			}
+		},
+		"/auth/code": {
+			"get": {
+				"tags": ["Auth"],
+				"summary": "Obter código de autorização do usuário do Github.",
+				"description": "Rota para obter um código de autorização do github para gerar um Acess Token que será usado para fazer login ou cadastrar-se. \n\n *Essa é uma rota para testes.*",
+				"responses": {
+					"200": {
+						"description": "Code has been sent!",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"code": {
+											"type": "string",
+											"example": "123456asdasdasd"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/login": {
+			"post": {
+				"tags": ["Auth"],
+				"summary": "Obter código de acesso",
+				"responses": {
+					"200": {
+						"description": "Logged in!",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"token": {
+											"type": "string"
+										},
+										"user": {
+											"type": "object",
+											"properties": {
+												"github_user": {
+													"type": "string"
+												},
+												"github_id": {
+													"type": "number"
+												},
+												"email": {
+													"type": "string"
+												},
+												"name": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Failed to get access token",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "User not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"name": "code",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"example": "123456asdasdasd"
+						}
+					}
+				]
+			}
+		},
+		"/auth/register": {
+			"post": {
+				"tags": ["Auth"],
+				"summary": "Criar conta",
+				"responses": {
+					"200": {
+						"description": "Conta criada com sucesso!",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"token": {
+											"type": "string"
+										},
+										"user": {
+											"type": "object",
+											"properties": {
+												"github_user": {
+													"type": "string"
+												},
+												"github_id": {
+													"type": "number"
+												},
+												"email": {
+													"type": "string"
+												},
+												"name": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Failed to get access token",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "User already exists",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"name": "code",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"example": "123456asdasdasd"
+						}
+					}
+				]
+			}
+		},
+		"/user": {
+			"get": {
+				"tags": ["User"],
+				"summary": "Obter dados do usuário logado",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"default": {
+						"description": "User data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserAuthenticatedData"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": ["User"],
+				"summary": "Atualizar dados do usuário logado",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": ["User"],
+				"summary": "Excluir conta do usuário logado",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"default": {}
+				}
+			}
+		},
+		"/user/:slug": {
+			"get": {
+				"tags": ["User"],
+				"summary": "Obter dados da página de um usuário",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PublicPageData"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"name": "slug",
+						"in": "path",
+						"required": true
+					}
+				]
+			}
+		}
+	}
 }

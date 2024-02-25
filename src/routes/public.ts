@@ -18,7 +18,7 @@ publicRouter.get('/', (_, res) => {
 
 publicRouter.get('/ping', (_, res) => {
 	res.send({
-		message: `[${process.env.APP_NAME}] Ping`,
+		message: 'Pong!',
 	});
 });
 

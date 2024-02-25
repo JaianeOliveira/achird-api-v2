@@ -84,6 +84,7 @@ export class UserService implements IUserService {
 		const [database_data, github_data, repositories] = await Promise.all(promises);
 
 		const utilData = {
+			name: github_data.user.name,
 			slug: database_data.slug,
 			email: database_data.email,
 			page_is_public: database_data.page_is_public,
