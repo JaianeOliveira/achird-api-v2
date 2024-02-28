@@ -8,8 +8,6 @@
 
 ## Autores
 
-- [@jaianeoliveira](https://www.github.com/jaianeoliveira)
-- [@alexsandro49](https://www.github.com/alexsandro49)
 
 ## Feedbacks e bugs
 
