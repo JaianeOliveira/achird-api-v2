@@ -1,7 +1,4 @@
-export type SocialAccount = {
-	provider: string;
-	url: string;
-};
+import { SocialAccount, User } from '@/entities/User';
 
 export type FindUserQueries = {
 	email?: string;
@@ -9,16 +6,24 @@ export type FindUserQueries = {
 	github_id?: number;
 };
 
-export type UpdateUserDTO = {
-	email?: string;
-	github_user?: string;
-	social_accounts?: { provider: string; url: string }[];
+export type UpdateUserDTO = Partial<Omit<CreateUserDTO, 'github_id'>> & {
+	professional_experience?: any[];
+	page_is_public?: boolean;
+	theme?: string;
+	slug?: string;
 };
-export type CreateUserDTO = {
-	email: string;
-	github_id: number;
-	github_user: string;
-	social_accounts?: { provider: string; url: string }[];
+export type CreateUserDTO = Pick<
+	User,
+	| 'name'
+	| 'email'
+	| 'bio'
+	| 'avatar_url'
+	| 'github_id'
+	| 'github_user'
+	| 'social_accounts'
+	| 'repositories'
+> & {
+	professional_experience: any[];
 };
 
 export type PublicProfileData = {

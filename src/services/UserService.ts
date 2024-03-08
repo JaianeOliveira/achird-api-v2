@@ -1,4 +1,8 @@
 import { IUserRepository } from '@/repositories/interfaces/IUserRepository';
+import { DataMapper } from '@/utils/DataMapper';
+import { NotFoundException, UnauthorizedException } from '@/utils/Exceptions';
+import { IGithubService } from './interfaces/IGithubService';
+import { IJwtService } from './interfaces/IJWTService';
 import {
 	CreateUserDTO,
 	FindUserQueries,
@@ -6,9 +10,6 @@ import {
 	PublicProfileData,
 	UpdateUserDTO,
 } from './interfaces/IUserService';
-import { IGithubService } from './interfaces/IGithubService';
-import { ConflictException, NotFoundException, UnauthorizedException } from '@/utils/Exceptions';
-import { IJwtService } from './interfaces/IJWTService';
 
 export class UserService implements IUserService {
 	constructor(
@@ -18,41 +19,14 @@ export class UserService implements IUserService {
 	) {}
 
 	async create(data: CreateUserDTO) {
-		const userExists = await this.userRepository.exists({
-			github_id: data.github_id,
-			email: data.email,
-			github_user: data.github_user,
-		});
+		const user_data = DataMapper.createUser(data);
 
-		if (userExists) {
-			throw new ConflictException('User already exists');
-		}
-
-		const date = new Date().toISOString();
-
-		const newUserData = {
-			...data,
-			social_accounts: data.social_accounts || [],
-			created_at: date,
-			updated_at: date,
-			slug: data.github_user.toLowerCase(),
-			theme: 'default',
-			page_is_public: false,
-			profissional_experience: [],
-		};
-
-		await this.userRepository.create(newUserData);
+		await this.userRepository.create(user_data);
 	}
 	async update(github_id: number, data: UpdateUserDTO): Promise<void> {
-		const userExists = await this.userRepository.exists({
-			github_id: github_id,
-		});
+		const user_data = DataMapper.updateUser(data);
 
-		if (!userExists) {
-			throw new NotFoundException('User not found');
-		}
-
-		await this.userRepository.update(github_id, data);
+		await this.userRepository.update(github_id, user_data);
 	}
 
 	async delete(github_id: number) {
@@ -125,6 +99,6 @@ export class UserService implements IUserService {
 
 	async list() {
 		const users = await this.userRepository.list();
-		return users.map((user) => ({ github_user: user.github_user, slug: user.slug }));
+		return users.map((user) => ({ github_user: user.github_user, slug: user.page_config.slug }));
 	}
 }

@@ -1,5 +1,5 @@
 export type AuthResponse = {
-	token: string;
+	jwt_token: string;
 	user: {
 		github_id: number;
 		github_user: string;
@@ -9,6 +9,5 @@ export type AuthResponse = {
 };
 
 export interface IAuthService {
-	login(code: string, referer: string): Promise<AuthResponse>;
-	register(code: string, referer: string): Promise<AuthResponse>;
+	authenticate(code: string, referer: string): Promise<AuthResponse>;
 }

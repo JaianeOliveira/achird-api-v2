@@ -1,8 +1,8 @@
-import { BadRequestException, ConflictException, NotFoundException } from '@/utils/Exceptions';
+import { BadRequestException } from '@/utils/Exceptions';
 import { IAuthService } from './interfaces/IAuthService';
 import { IGithubService } from './interfaces/IGithubService';
-import { IUserService } from './interfaces/IUserService';
 import { IJwtService } from './interfaces/IJWTService';
+import { CreateUserDTO, IUserService } from './interfaces/IUserService';
 
 export class AuthService implements IAuthService {
 	constructor(
@@ -11,94 +11,63 @@ export class AuthService implements IAuthService {
 		private jwtService: IJwtService,
 	) {}
 
-	async login(code: string, referer: string) {
+	async authenticate(code: string, referer: string) {
 		if (!code) {
-			throw new BadRequestException('Código não encontrado', 'Code is required');
+			throw new BadRequestException(
+				'Código não encontrado',
+				'Code is required',
+				'AuthService@login',
+			);
 		}
 
-		const access_token = await this.githubService.getAccessTokenByCode(code, referer);
+		const github_access_token = await this.githubService.getAccessTokenByCode(code, referer);
 
-		const userData = await this.githubService.getAuthenticatedUser(access_token);
-		// const userData = await this.userService.getUserAuthenticatedData(access_token);
+		const github_user_data = await this.githubService.getAuthenticatedUser(github_access_token);
+		const github_user_repositories = await this.githubService.getRepositories(
+			github_user_data.user.login,
+		);
 
-		const data = {
-			github_id: userData.user.id,
-			github_user: userData.user.login,
-			email: userData.user.email,
-			social_accounts: userData.social_accounts,
+		const github_util_data = {
+			name: github_user_data.user.name,
+			bio: github_user_data.user.bio,
+			avatar_url: github_user_data.user.avatar_url,
+			email: github_user_data.user.email,
+			github_user: github_user_data.user.login,
+			github_id: github_user_data.user.id,
+			social_accounts: github_user_data.social_accounts,
+			repositories: github_user_repositories,
 		};
 
-		const userExists = await this.userService.exists({
-			email: data.email,
-			github_user: data.github_user,
-			github_id: data.github_id,
+		const user_data: CreateUserDTO = {
+			...github_util_data,
+			professional_experience: [],
+		};
+
+		const user_exists = await this.userService.exists({
+			email: user_data.email,
+			github_user: user_data.github_user,
+			github_id: user_data.github_id,
 		});
 
-		if (!userExists) {
-			throw new NotFoundException('Usuário não encontrado', 'User not found');
+		if (!user_exists) {
+			await this.userService.create(user_data);
 		} else {
-			await this.userService.update(data.github_id, {
-				email: data.email,
-				github_user: data.github_user,
-				social_accounts: data.social_accounts,
-			});
-			const token = this.jwtService.sign({
-				github_access_token: access_token,
-				github_user: data.github_user,
-				github_id: data.github_id,
-			});
-			return {
-				token,
-				user: {
-					github_id: data.github_id,
-					github_user: data.github_user,
-					email: data.email,
-					name: userData.user.name,
-				},
-			};
-		}
-	}
-	async register(code: string, referer: string) {
-		if (!code) {
-			throw new BadRequestException('Código não encontrado', 'Code is required');
+			await this.userService.update(user_data.github_id, github_util_data);
 		}
 
-		const access_token = await this.githubService.getAccessTokenByCode(code, referer);
-
-		const userData = await this.githubService.getAuthenticatedUser(access_token);
-
-		const userExists = await this.userService.exists({
-			email: userData.user.email,
-			github_user: userData.user.login,
-			github_id: userData.user.id,
-		});
-
-		if (userExists) {
-			throw new ConflictException('Este usuário já está registrado', 'User already exists');
-		}
-
-		const newUserData = {
-			email: userData.user.email,
-			github_id: userData.user.id,
-			github_user: userData.user.login,
-			social_accounts: userData.social_accounts,
-		};
-
-		await this.userService.create(newUserData);
-
-		const token = this.jwtService.sign({
-			github_access_token: access_token,
-			github_user: userData.github_user,
-			github_id: userData.github_id,
+		const jwt_token = this.jwtService.sign({
+			github_access_token,
+			github_user: user_data.github_user,
+			github_id: user_data.github_id,
 		});
 
 		return {
-			token,
+			jwt_token,
 			user: {
-				github_id: userData.user.id,
-				github_user: userData.user.login,
-				email: userData.user.email,
-				name: userData.user.name,
+				github_id: user_data.github_id,
+				github_user: user_data.github_user,
+				email: user_data.email,
+				name: user_data.name,
 			},
 		};
 	}

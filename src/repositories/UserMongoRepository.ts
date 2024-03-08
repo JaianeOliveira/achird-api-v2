@@ -1,6 +1,7 @@
-import { FindUserQueries } from '@/services/interfaces/IUserService';
-import { IUser, IUserRepository } from './interfaces/IUserRepository';
+import { User } from '@/entities/User';
 import { IMongoService } from '@/services/interfaces/IMongoService';
+import { FindUserQueries } from '@/services/interfaces/IUserService';
+import { IUserRepository } from './interfaces/IUserRepository';
 
 export class UserMongoRepository implements IUserRepository {
 	private db: any;
@@ -9,7 +10,7 @@ export class UserMongoRepository implements IUserRepository {
 		this.db = this.mongoService.getClient().db('achird-api');
 		this.collection = this.db.collection('users');
 	}
-	async update(github_id: number, data: Partial<Omit<IUser, '_id'>>): Promise<void> {
+	async update(github_id: number, data: Partial<Omit<User, '_id'>>): Promise<void> {
 		await this.collection.updateOne(
 			{ github_id },
 			{
@@ -19,7 +20,7 @@ export class UserMongoRepository implements IUserRepository {
 			},
 		);
 	}
-	async create(data: Omit<IUser, '_id'>): Promise<void> {
+	async create(data: Omit<User, '_id'>): Promise<void> {
 		await this.collection.insertOne({
 			...data,
 		});
@@ -39,11 +40,11 @@ export class UserMongoRepository implements IUserRepository {
 			})
 			.count());
 	}
-	async find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<IUser> {
+	async find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<User> {
 		return await this.collection.findOne({
 			$or: [
 				{ id: queries.id },
-				{ slug: queries.slug },
+				{ page_config: { slug: queries.slug } },
 				{ email: queries.email },
 				{ github_user: queries.github_user },
 				{ github_id: queries.github_id },
@@ -51,7 +52,7 @@ export class UserMongoRepository implements IUserRepository {
 		});
 	}
 
-	async list(): Promise<IUser[]> {
+	async list(): Promise<User[]> {
 		const users = await this.collection.find().toArray();
 
 		return users;

@@ -1,16 +1,17 @@
+import { User } from '@/entities/User';
 import { FindUserQueries } from '@/services/interfaces/IUserService';
-import { IUser, IUserRepository } from './interfaces/IUserRepository';
+import { IUserRepository } from './interfaces/IUserRepository';
 
 export class UserMemoryRepository implements IUserRepository {
-	private users: IUser[] = [];
+	private users: User[] = [];
 
-	async create(data: Omit<IUser, '_id'>) {
+	async create(data: Omit<User, '_id'>) {
 		this.users.push({
 			_id: new Date().toISOString(),
 			...data,
 		});
 	}
-	async update(github_id: number, data: Partial<Omit<IUser, '_id'>>): Promise<void> {
+	async update(github_id: number, data: Partial<Omit<User, '_id'>>): Promise<void> {
 		const userIndex = this.users.findIndex((u) => u.github_id === github_id);
 
 		this.users[userIndex] = {
@@ -30,19 +31,19 @@ export class UserMemoryRepository implements IUserRepository {
 		return !!(await this.find(queries));
 	}
 
-	async find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<IUser> {
+	async find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<User> {
 		return this.users.find((user) => {
 			return (
 				user.email === queries.email ||
 				user.github_user === queries.github_user ||
 				user.github_id === queries.github_id ||
 				user._id === queries.id ||
-				user.slug === queries.slug
+				user.page_config.slug === queries.slug
 			);
 		})!;
 	}
 
-	async list(): Promise<IUser[]> {
+	async list(): Promise<User[]> {
 		return [...this.users];
 	}
 }

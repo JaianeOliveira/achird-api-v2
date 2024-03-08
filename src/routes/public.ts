@@ -1,9 +1,10 @@
+import docsV2 from '@/docs/swagger.json';
+import dotenv from 'dotenv';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import docsV2 from '@/docs/swagger.json';
 import { authController, userController } from './setup';
+
 export const publicRouter = Router();
-import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -22,8 +23,7 @@ publicRouter.get('/ping', (_, res) => {
 	});
 });
 
-publicRouter.post('/auth/login', authController.login.bind(authController));
-publicRouter.post('/auth/register', authController.register.bind(authController));
+publicRouter.post('/auth', authController.authenticate.bind(authController));
 
 publicRouter.get('/auth/code', (req, res) => {
 	const code = req.query.code;
