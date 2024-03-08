@@ -88,3 +88,35 @@ describe('When trying to update a user', () => {
 		expect(user.name).toEqual('Jane Doe');
 	});
 });
+
+describe('When trying to get a authenticated user data', () => {
+	let userService: UserService;
+	let userRepository: IUserRepository & { clearAll: () => Promise<void> };
+	let githubService: IGithubService;
+	let jwtService: IJwtService;
+
+	beforeAll(async () => {
+		githubService = new FakeGithubService();
+		userRepository = new UserMemoryRepository();
+		jwtService = new FakeJwtService();
+		userService = new UserService(userRepository, githubService, jwtService);
+
+		await userService.create({
+			name: 'John Doe',
+			avatar_url: 'https://github.com/johndoe.png',
+			bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+			email: 'johndoe@me.com',
+			github_id: 123456,
+			github_user: 'johndoe',
+			professional_experience: [],
+			repositories: [],
+			social_accounts: [],
+		});
+	});
+
+	it('Should return a authenticated user data', async () => {
+		const data = await userService.getUserAuthenticatedData('123');
+
+		expect(data.name).toEqual('John Doe');
+	});
+});

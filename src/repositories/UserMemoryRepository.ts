@@ -44,7 +44,7 @@ export class UserMemoryRepository implements IUserRepository {
 	}
 
 	async list(): Promise<User[]> {
-		return [...this.users];
+		return this.users;
 	}
 
 	async clearAll(): Promise<void> {

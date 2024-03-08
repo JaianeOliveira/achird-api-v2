@@ -1,7 +1,7 @@
 import { IUserService } from '@/services/interfaces/IUserService';
-import { IUserController } from './interfaces/IUserController';
-import { Request, Response } from 'express';
 import { handleErrors } from '@/utils/HandleErrors';
+import { Request, Response } from 'express';
+import { IUserController } from './interfaces/IUserController';
 
 export class UserController implements IUserController {
 	constructor(private userService: IUserService) {}
@@ -13,6 +13,7 @@ export class UserController implements IUserController {
 	}
 
 	async getUserAuthenticatedData(req: Request, res: Response): Promise<void> {
+		console.log('UserController@getUserAuthenticatedData');
 		const token = req.headers.authorization as string;
 
 		handleErrors(req, res, () => this.userService.getUserAuthenticatedData(token));

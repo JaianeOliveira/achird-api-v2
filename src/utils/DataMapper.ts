@@ -14,7 +14,7 @@ export class DataMapper {
 			avatar_url: data.avatar_url,
 			page_config: {
 				page_is_public: false,
-				slug: data.github_user.toLocaleLowerCase(),
+				slug: data.github_user?.toLocaleLowerCase(),
 				theme: 'default',
 			},
 			repositories: data.repositories,
@@ -39,11 +39,13 @@ export class DataMapper {
 
 		const mapped_data = {
 			...data,
-			page_config: {
-				theme,
-				page_is_public,
-				slug,
-			},
+			...((page_is_public || slug || theme) && {
+				page_config: {
+					...(page_is_public && { page_is_public }),
+					...(slug && { slug: data.github_user?.toLocaleLowerCase() }),
+					...(theme && { theme }),
+				},
+			}),
 			updated_at: current_date,
 		};
 

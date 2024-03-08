@@ -20,10 +20,11 @@ export class UserService implements IUserService {
 
 	async create(data: CreateUserDTO) {
 		const user_data = DataMapper.createUser(data);
-
 		await this.userRepository.create(user_data);
 	}
 	async update(github_id: number, data: UpdateUserDTO): Promise<void> {
+		console.log('UserService@update');
+
 		const user_data = DataMapper.updateUser(data);
 
 		await this.userRepository.update(github_id, user_data);
@@ -42,35 +43,29 @@ export class UserService implements IUserService {
 	}
 
 	async getUserAuthenticatedData(bearer_token: string): Promise<any> {
+		console.log('UserService@getUserAuthenticatedData', bearer_token);
+
 		if (!bearer_token) {
-			throw new UnauthorizedException('Invalid token');
+			throw new UnauthorizedException('Token not found');
 		}
 
 		const token = bearer_token.split(' ')[1];
 
-		const { github_access_token, github_user } = await this.jwtService.verify(token);
+		const { github_user } = await this.jwtService.verify(token);
 
-		const promises = [
-			this.userRepository.find({ github_user }),
-			this.githubService.getAuthenticatedUser(github_access_token),
-			this.githubService.getRepositories(github_user),
-		];
-		const [database_data, github_data, repositories] = await Promise.all(promises);
+		console.log(github_user);
 
-		const utilData = {
-			name: github_data.user.name,
-			slug: database_data.slug,
-			email: database_data.email,
-			page_is_public: database_data.page_is_public,
-			social_accounts: database_data.social_accounts,
-			github_user: database_data.github_user,
-			avatar_url: github_data.user.avatar_url,
-			repositories,
-			theme: database_data.theme,
-			profissional_experience: database_data.profissional_experience,
-		};
+		const data = await this.userRepository.find({
+			github_user,
+		});
 
-		return utilData;
+		console.log(data);
+
+		if (!data) {
+			throw new NotFoundException('User not found');
+		}
+
+		return data;
 	}
 
 	async exists(queries: FindUserQueries) {
@@ -99,6 +94,6 @@ export class UserService implements IUserService {
 
 	async list() {
 		const users = await this.userRepository.list();
-		return users.map((user) => ({ github_user: user.github_user, slug: user.page_config.slug }));
+		return users.map((user) => user);
 	}
 }
