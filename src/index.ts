@@ -1,6 +1,6 @@
-import express, { json } from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import express, { json } from 'express';
 
 import { publicRouter } from '@/routes/public';
 import morgan from 'morgan';
@@ -24,6 +24,6 @@ app.use('/api/v2', privateRoutes);
 
 app.listen(port, () => {
 	console.log(
-		`[${process.env.APP_NAME}] Server is running on port http://localhost:${port} \n Access http://localhost:${port}/api/v2 to see the documentation`,
+		`[${process.env.APP_NAME}] Server is running on port http://localhost:${port} \n Access http://localhost:${port}/api/v2/api-docs to see the documentation`,
 	);
 });
