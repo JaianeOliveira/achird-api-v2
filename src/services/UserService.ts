@@ -50,9 +50,7 @@ export class UserService implements IUserService {
 
 		const { github_user } = await this.jwtService.verify(token);
 
-		const data = await this.userRepository.find({
-			github_user,
-		});
+		const data = await this.userRepository.findByGithubUser(github_user);
 
 		if (!data) {
 			throw new NotFoundException('User not found');
@@ -66,7 +64,7 @@ export class UserService implements IUserService {
 	}
 
 	async getPageData(slug: string): Promise<PublicProfileData> {
-		const databaseUser = await this.userRepository.find({ slug });
+		const databaseUser = await this.userRepository.findBySlug(slug);
 		const public_profile_data = DataMapper.pageDataDTO(databaseUser);
 
 		return public_profile_data;
@@ -86,9 +84,7 @@ export class UserService implements IUserService {
 
 		const { github_id } = await this.jwtService.verify(token);
 
-		const user = await this.userRepository.find({
-			github_id,
-		});
+		const user = await this.userRepository.findByGithubId(github_id);
 
 		if (!user) {
 			throw new NotFoundException('User not found');

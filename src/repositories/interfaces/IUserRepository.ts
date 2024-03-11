@@ -12,4 +12,10 @@ export interface IUserRepository {
 	find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<User>;
 	list(): Promise<User[]>;
 	updatePageConfig(github_id: number, data: Partial<PageConfig>): Promise<void>;
+
+	findByGithubUser(github_user: string): Promise<User>;
+
+	findByGithubId(github_id: number): Promise<User>;
+
+	findBySlug(slug: string): Promise<User>;
 }

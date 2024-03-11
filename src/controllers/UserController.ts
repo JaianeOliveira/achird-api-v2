@@ -13,7 +13,6 @@ export class UserController implements IUserController {
 	}
 
 	async getUserAuthenticatedData(req: Request, res: Response): Promise<void> {
-		console.log('UserController@getUserAuthenticatedData');
 		const token = req.headers.authorization as string;
 
 		handleErrors(req, res, () => this.userService.getUserAuthenticatedData(token));

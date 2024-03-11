@@ -6,7 +6,6 @@ export class AuthMiddleware {
 	constructor(private jwtService: IJwtService) {}
 
 	async isAuthenticated(req: Request, res: Response, next: NextFunction) {
-		console.log('AuthMiddleware@isAuthenticated');
 		try {
 			const token = req.headers.authorization;
 

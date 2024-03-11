@@ -11,13 +11,14 @@ export class UserMongoRepository implements IUserRepository {
 		this.collection = this.db.collection('users');
 	}
 	async update(github_id: number, data: Partial<Omit<User, '_id'>>): Promise<void> {
-		await this.collection.updateOne(
-			{ github_id },
+		await this.collection.findOneAndUpdate(
+			{ github_id: github_id },
 			{
 				$set: {
 					...data,
 				},
 			},
+			{ returnOriginal: false },
 		);
 	}
 	async create(data: Omit<User, '_id'>): Promise<void> {
@@ -44,12 +45,24 @@ export class UserMongoRepository implements IUserRepository {
 		return await this.collection.findOne({
 			$or: [
 				{ id: queries.id },
-				{ page_config: { slug: queries.slug } },
+				{ 'page_config.slug': queries.slug },
 				{ email: queries.email },
 				{ github_user: queries.github_user },
 				{ github_id: queries.github_id },
 			],
 		});
+	}
+
+	async findByGithubUser(github_user: string): Promise<User> {
+		return await this.collection.findOne({ github_user });
+	}
+
+	async findByGithubId(github_id: number): Promise<User> {
+		return await this.collection.findOne({ github_id });
+	}
+
+	async findBySlug(slug: string): Promise<User> {
+		return await this.collection.findOne({ 'page_config.slug': slug });
 	}
 
 	async list(): Promise<User[]> {

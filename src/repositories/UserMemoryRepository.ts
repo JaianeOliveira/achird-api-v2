@@ -62,4 +62,16 @@ export class UserMemoryRepository implements IUserRepository {
 			},
 		};
 	}
+
+	async findByGithubUser(github_user: string): Promise<User> {
+		return this.users.find((user) => user.github_user === github_user)!;
+	}
+
+	async findByGithubId(github_id: number): Promise<User> {
+		return this.users.find((user) => user.github_id === github_id)!;
+	}
+
+	async findBySlug(slug: string): Promise<User> {
+		return this.users.find((user) => user.page_config.slug === slug)!;
+	}
 }
