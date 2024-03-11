@@ -1,4 +1,4 @@
-import { User } from '@/entities/User';
+import { PageConfig, User } from '@/entities/User';
 import { IMongoService } from '@/services/interfaces/IMongoService';
 import { FindUserQueries } from '@/services/interfaces/IUserService';
 import { IUserRepository } from './interfaces/IUserRepository';
@@ -56,5 +56,18 @@ export class UserMongoRepository implements IUserRepository {
 		const users = await this.collection.find().toArray();
 
 		return users;
+	}
+
+	async updatePageConfig(github_id: number, data: Partial<PageConfig>): Promise<void> {
+		await this.collection.updateOne(
+			{ github_id },
+			{
+				$set: {
+					page_config: {
+						...data,
+					},
+				},
+			},
+		);
 	}
 }

@@ -11,4 +11,5 @@ export interface IUserRepository {
 	exists(queries: FindUserQueries): Promise<boolean>;
 	find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<User>;
 	list(): Promise<User[]>;
+	updatePageConfig(github_id: number, data: Partial<PageConfig>): Promise<void>;
 }

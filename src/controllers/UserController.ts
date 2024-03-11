@@ -9,7 +9,7 @@ export class UserController implements IUserController {
 	async getPageData(req: Request, res: Response): Promise<void> {
 		const slug = req.query.slug as string;
 
-		handleErrors(req, res, () => this.userService.getPublicProfile(slug));
+		handleErrors(req, res, () => this.userService.getPageData(slug));
 	}
 
 	async getUserAuthenticatedData(req: Request, res: Response): Promise<void> {
@@ -33,5 +33,16 @@ export class UserController implements IUserController {
 
 	async list(req: Request, res: Response) {
 		handleErrors(req, res, () => this.userService.list());
+	}
+
+	async updatePageConfig(req: Request, res: Response): Promise<void> {
+		const bearer_token = req.headers.authorization as string;
+		const data = req.body;
+
+		handleErrors(req, res, () => this.userService.updatePageConfig(bearer_token, data));
+	}
+
+	async updatePageData(req: Request, res: Response): Promise<void> {
+		handleErrors(req, res, () => this.userService.updatePageData(req.body));
 	}
 }

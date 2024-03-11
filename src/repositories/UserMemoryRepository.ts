@@ -1,4 +1,4 @@
-import { User } from '@/entities/User';
+import { PageConfig, User } from '@/entities/User';
 import { FindUserQueries } from '@/services/interfaces/IUserService';
 import { IUserRepository } from './interfaces/IUserRepository';
 
@@ -49,5 +49,17 @@ export class UserMemoryRepository implements IUserRepository {
 
 	async clearAll(): Promise<void> {
 		this.users = [];
+	}
+
+	async updatePageConfig(github_id: number, data: Partial<PageConfig>): Promise<void> {
+		const userIndex = this.users.findIndex((u) => u.github_id === github_id);
+
+		this.users[userIndex] = {
+			...this.users[userIndex],
+			page_config: {
+				...this.users[userIndex].page_config,
+				...data,
+			},
+		};
 	}
 }

@@ -1,5 +1,9 @@
 import { PageConfig, User } from '@/entities/User';
-import { CreateUserDTO, UpdateUserDTO } from '@/services/interfaces/IUserService';
+import {
+	CreateUserDTO,
+	PublicProfileData,
+	UpdateUserDTO,
+} from '@/services/interfaces/IUserService';
 
 export class DataMapper {
 	static createUser(data: CreateUserDTO): Omit<User, '_id'> {
@@ -15,7 +19,7 @@ export class DataMapper {
 			page_config: {
 				page_is_public: false,
 				slug: data.github_user?.toLocaleLowerCase(),
-				theme: 'default',
+				theme: 'achird-dark',
 			},
 			repositories: data.repositories,
 			social_accounts: data.social_accounts,
@@ -50,5 +54,24 @@ export class DataMapper {
 		};
 
 		return mapped_data;
+	}
+
+	static pageDataDTO(pageData: User): PublicProfileData {
+		const dto: PublicProfileData = {
+			name: pageData.name,
+			email: pageData.email,
+			avatar_url: pageData.avatar_url || '',
+			github_user: pageData.github_user,
+			bio: pageData.bio || '',
+			github_profile_url: `https://github.com/${pageData.github_user}`,
+			social_accounts: pageData.social_accounts,
+			repositories: pageData.repositories,
+			profissional_experience: pageData.professional_experience,
+			page_is_public: pageData.page_config.page_is_public,
+			theme: pageData.page_config.theme,
+			slug: pageData.page_config.slug,
+		};
+
+		return dto;
 	}
 }

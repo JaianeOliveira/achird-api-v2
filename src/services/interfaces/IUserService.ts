@@ -1,4 +1,4 @@
-import { SocialAccount, User } from '@/entities/User';
+import { PageConfig, SocialAccount, User } from '@/entities/User';
 
 export type FindUserQueries = {
 	email?: string;
@@ -36,6 +36,9 @@ export type PublicProfileData = {
 	social_accounts: SocialAccount[];
 	repositories: any[];
 	profissional_experience: any[];
+	page_is_public: boolean;
+	theme: string;
+	slug: string;
 };
 export interface IUserService {
 	getUserAuthenticatedData(bearer_token: string): Promise<any>;
@@ -43,6 +46,8 @@ export interface IUserService {
 	update(github_id: number, data: UpdateUserDTO): Promise<void>;
 	create(data: CreateUserDTO): Promise<void>;
 	delete(github_id: number): Promise<void>;
-	getPublicProfile(github_user: string): Promise<PublicProfileData>;
+	getPageData(slug: string): Promise<PublicProfileData>;
 	list(): Promise<any>;
+	updatePageConfig(bearer_token: string, data: Partial<PageConfig>): Promise<void>;
+	updatePageData(bearer_token: string): Promise<void>;
 }

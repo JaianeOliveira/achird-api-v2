@@ -24,7 +24,7 @@ export const userMongoRepository = new UserMongoRepository(mongoService);
 
 export const githubService = new GithubService(api);
 export const jwtService = new JwtService();
-export const userService = new UserService(userMemoryRepository, githubService, jwtService);
+export const userService = new UserService(userMongoRepository, githubService, jwtService);
 export const authService = new AuthService(githubService, userService, jwtService);
 
 export const authController = new AuthController(authService);

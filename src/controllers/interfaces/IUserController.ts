@@ -6,4 +6,6 @@ export interface IUserController {
 	updateUser(req: Request, res: Response): Promise<void>;
 	deleteUser(req: Request, res: Response): Promise<void>;
 	list(req: Request, res: Response): Promise<void>;
+	updatePageConfig(req: Request, res: Response): Promise<void>;
+	updatePageData(req: Request, res: Response): Promise<void>;
 }

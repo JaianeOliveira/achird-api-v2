@@ -1,3 +1,4 @@
+import { PageConfig } from '@/entities/User';
 import { IUserRepository } from '@/repositories/interfaces/IUserRepository';
 import { DataMapper } from '@/utils/DataMapper';
 import { NotFoundException, UnauthorizedException } from '@/utils/Exceptions';
@@ -23,8 +24,6 @@ export class UserService implements IUserService {
 		await this.userRepository.create(user_data);
 	}
 	async update(github_id: number, data: UpdateUserDTO): Promise<void> {
-		console.log('UserService@update');
-
 		const user_data = DataMapper.updateUser(data);
 
 		await this.userRepository.update(github_id, user_data);
@@ -43,8 +42,6 @@ export class UserService implements IUserService {
 	}
 
 	async getUserAuthenticatedData(bearer_token: string): Promise<any> {
-		console.log('UserService@getUserAuthenticatedData', bearer_token);
-
 		if (!bearer_token) {
 			throw new UnauthorizedException('Token not found');
 		}
@@ -53,13 +50,9 @@ export class UserService implements IUserService {
 
 		const { github_user } = await this.jwtService.verify(token);
 
-		console.log(github_user);
-
 		const data = await this.userRepository.find({
 			github_user,
 		});
-
-		console.log(data);
 
 		if (!data) {
 			throw new NotFoundException('User not found');
@@ -72,28 +65,65 @@ export class UserService implements IUserService {
 		return await this.userRepository.exists({ ...queries });
 	}
 
-	async getPublicProfile(slug: string): Promise<PublicProfileData> {
+	async getPageData(slug: string): Promise<PublicProfileData> {
 		const databaseUser = await this.userRepository.find({ slug });
-		const githubUser = await this.githubService.getUser(databaseUser.github_user);
-		const repos = await this.githubService.getRepositories(databaseUser.github_user);
+		const public_profile_data = DataMapper.pageDataDTO(databaseUser);
 
-		const data: PublicProfileData = {
-			name: githubUser.name,
-			email: databaseUser.email,
-			avatar_url: githubUser.avatar_url,
-			bio: githubUser.bio,
-			github_user: databaseUser.github_user,
-			github_profile_url: githubUser.html_url,
-			social_accounts: databaseUser.social_accounts,
-			profissional_experience: [],
-			repositories: repos,
-		};
-
-		return data;
+		return public_profile_data;
 	}
 
 	async list() {
 		const users = await this.userRepository.list();
 		return users.map((user) => user);
+	}
+
+	async updatePageConfig(bearer_token: string, data: Partial<PageConfig>) {
+		if (!bearer_token) {
+			throw new UnauthorizedException('Token not found');
+		}
+
+		const token = bearer_token.split(' ')[1];
+
+		const { github_id } = await this.jwtService.verify(token);
+
+		const user = await this.userRepository.find({
+			github_id,
+		});
+
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+
+		await this.userRepository.updatePageConfig(github_id, { ...user.page_config, ...data });
+	}
+
+	async updatePageData(bearer_token: string) {
+		if (!bearer_token) {
+			throw new UnauthorizedException('Token not found');
+		}
+
+		const token = bearer_token.split(' ')[1];
+
+		const { github_access_token } = await this.jwtService.verify(token);
+
+		const github_user_data = await this.githubService.getAuthenticatedUser(github_access_token);
+		const github_user_repositories = await this.githubService.getRepositories(
+			github_user_data.user.login,
+		);
+
+		const github_util_data = {
+			name: github_user_data.user.name,
+			bio: github_user_data.user.bio,
+			avatar_url: github_user_data.user.avatar_url,
+			email: github_user_data.user.email,
+			github_user: github_user_data.user.login,
+			github_id: github_user_data.user.id,
+			social_accounts: github_user_data.social_accounts,
+			repositories: github_user_repositories,
+		};
+
+		const user_data = DataMapper.updateUser(github_util_data);
+
+		await this.userRepository.update(github_user_data.user.id, user_data);
 	}
 }
