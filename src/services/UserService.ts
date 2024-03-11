@@ -65,6 +65,11 @@ export class UserService implements IUserService {
 
 	async getPageData(slug: string): Promise<PublicProfileData> {
 		const databaseUser = await this.userRepository.findBySlug(slug);
+
+		if (!databaseUser) {
+			throw new NotFoundException('User not found');
+		}
+
 		const public_profile_data = DataMapper.pageDataDTO(databaseUser);
 
 		return public_profile_data;

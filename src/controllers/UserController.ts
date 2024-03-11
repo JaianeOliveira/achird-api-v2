@@ -7,8 +7,7 @@ export class UserController implements IUserController {
 	constructor(private userService: IUserService) {}
 
 	async getPageData(req: Request, res: Response): Promise<void> {
-		const slug = req.query.slug as string;
-
+		const slug = req.params.slug as string;
 		handleErrors(req, res, () => this.userService.getPageData(slug));
 	}
 
