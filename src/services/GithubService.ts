@@ -1,7 +1,7 @@
+import { Exception } from '@/utils/Exceptions';
+import { queryStringToObject } from '@/utils/QueryString';
 import { AxiosInstance } from 'axios';
 import { IGithubService, Repository } from './interfaces/IGithubService';
-import { queryStringToObject } from '@/utils/QueryString';
-import { Exception } from '@/utils/Exceptions';
 
 export class GithubService implements IGithubService {
 	private GITHUB_ACCESS_TOKEN_URL: string;
@@ -21,6 +21,7 @@ export class GithubService implements IGithubService {
 
 		const headers = {
 			'Content-Type': 'application/json',
+			'User-Agent': 'achird-api-v2',
 		};
 
 		const { data } = await this.axios.post(this.GITHUB_ACCESS_TOKEN_URL, body, {
