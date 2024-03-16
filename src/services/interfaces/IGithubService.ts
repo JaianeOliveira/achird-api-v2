@@ -2,7 +2,7 @@ export interface IGithubService {
 	getAccessTokenByCode(code: string, redirect_uri: string): Promise<string>;
 	getAuthenticatedUser(token: string): Promise<any>;
 	getUser(github_user: string): Promise<any>;
-	getRepositories(github_user: string): Promise<any>;
+	getRepositories(access_token: string): Promise<any>;
 }
 
 export type Repository = {

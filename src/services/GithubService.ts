@@ -74,10 +74,11 @@ export class GithubService implements IGithubService {
 		return data;
 	}
 
-	async getRepositories(github_user: string): Promise<Repository[]> {
-		const { data } = await this.axios.get(`https://api.github.com/users/${github_user}/repos`, {
+	async getRepositories(access_token: string): Promise<Repository[]> {
+		const { data } = await this.axios.get('https://api.github.com/user/repos', {
 			headers: {
 				'User-Agent': 'achird-api-v2',
+				Authorization: `Bearer ${access_token}`,
 			},
 		});
 

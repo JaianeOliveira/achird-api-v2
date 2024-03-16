@@ -23,7 +23,7 @@ export class FakeGithubService implements IGithubService {
 		});
 	}
 
-	getRepositories(github_user: string): Promise<any> {
+	getRepositories(github_access_token: string): Promise<any> {
 		return new Promise((resolve) => {
 			resolve([
 				{
