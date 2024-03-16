@@ -70,6 +70,7 @@ export class UserService implements IUserService {
 			github_user: user.github_user,
 			avatar_url: user.avatar_url,
 			slug: user.page_config.slug,
+			bio: user.bio,
 		}));
 	}
 }
