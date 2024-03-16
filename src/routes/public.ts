@@ -2,7 +2,7 @@ import docsV2 from '@/docs/swagger.json';
 import dotenv from 'dotenv';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { authController, userController } from './setup';
+import { authController, pageController, userController } from './setup';
 
 export const publicRouter = Router();
 
@@ -41,4 +41,4 @@ publicRouter.get('/auth/code', (req, res) => {
 });
 
 publicRouter.get('/users', userController.list.bind(userController));
-publicRouter.get('/user/:slug', userController.getPageData.bind(userController));
+publicRouter.get('/user/:slug', pageController.getPageData.bind(userController));
