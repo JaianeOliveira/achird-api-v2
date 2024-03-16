@@ -43,8 +43,6 @@ export class AuthService implements IAuthService {
 			};
 
 			const user_exists = await this.userService.exists({
-				email: user_data.email,
-				github_user: user_data.github_user,
 				github_id: user_data.github_id,
 			});
 
