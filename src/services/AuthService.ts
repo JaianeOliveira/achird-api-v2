@@ -71,6 +71,7 @@ export class AuthService implements IAuthService {
 				},
 			};
 		} catch (error) {
+			console.log(error);
 			throw new BadRequestException(
 				'Ops! Parece que estamos com problemas internos. Estramos trabalhando para resolver isto. Tente mais tarde novamente',
 				'Error on Github API',
