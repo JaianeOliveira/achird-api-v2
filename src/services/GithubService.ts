@@ -46,11 +46,13 @@ export class GithubService implements IGithubService {
 			this.axios.get('https://api.github.com/user', {
 				headers: {
 					Authorization: `Bearer ${token}`,
+					'User-Agent': 'achird-api-v2',
 				},
 			}),
 			this.axios.get('https://api.github.com/user/social_accounts', {
 				headers: {
 					Authorization: `Bearer ${token}`,
+					'User-Agent': 'achird-api-v2',
 				},
 			}),
 		];
@@ -63,13 +65,21 @@ export class GithubService implements IGithubService {
 	}
 
 	async getUser(github_user: string): Promise<any> {
-		const { data } = await this.axios.get(`https://api.github.com/users/${github_user}`);
+		const { data } = await this.axios.get(`https://api.github.com/users/${github_user}`, {
+			headers: {
+				'User-Agent': 'achird-api-v2',
+			},
+		});
 
 		return data;
 	}
 
 	async getRepositories(github_user: string): Promise<Repository[]> {
-		const { data } = await this.axios.get(`https://api.github.com/users/${github_user}/repos`);
+		const { data } = await this.axios.get(`https://api.github.com/users/${github_user}/repos`, {
+			headers: {
+				'User-Agent': 'achird-api-v2',
+			},
+		});
 
 		const filteredRepos = data.filter(
 			(repo: any) => repo.topics.includes('frontend') || repo.topics.includes('view-on-achird'),
