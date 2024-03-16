@@ -41,4 +41,4 @@ publicRouter.get('/auth/code', (req, res) => {
 });
 
 publicRouter.get('/users', userController.list.bind(userController));
-publicRouter.get('/user/:slug', pageController.getPageData.bind(userController));
+publicRouter.get('/user/:slug', pageController.getPageData.bind(pageController));
