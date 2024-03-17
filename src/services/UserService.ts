@@ -47,9 +47,9 @@ export class UserService implements IUserService {
 
 		const token = bearer_token.split(' ')[1];
 
-		const { github_user } = await this.jwtService.verify(token);
+		const { github_id } = await this.jwtService.verify(token);
 
-		const data = await this.userRepository.findByGithubUser(github_user);
+		const data = await this.userRepository.findByGithubId(github_id);
 
 		if (!data) {
 			throw new NotFoundException('User not found');
