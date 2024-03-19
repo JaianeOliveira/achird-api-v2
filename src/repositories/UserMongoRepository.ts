@@ -31,15 +31,14 @@ export class UserMongoRepository implements IUserRepository {
 	}
 
 	async exists(queries: FindUserQueries): Promise<boolean> {
-		return !!(await this.collection
-			.find({
-				$or: [
-					{ email: queries.email },
-					{ github_user: queries.github_user },
-					{ github_id: queries.github_id },
-				],
-			})
-			.count());
+		const user = await this.collection.findOne({
+			$or: [
+				{ github_user: { $eq: queries.github_user } },
+				{ github_id: { $eq: queries.github_id } },
+			],
+		});
+
+		return !!user;
 	}
 	async find(queries: FindUserQueries & { id?: string; slug?: string }): Promise<User> {
 		return await this.collection.findOne({

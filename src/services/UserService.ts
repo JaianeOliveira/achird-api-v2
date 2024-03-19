@@ -21,6 +21,8 @@ export class UserService implements IUserService {
 	async create(data: CreateUserDTO) {
 		const user_data = DataMapper.createUser(data);
 		await this.userRepository.create(user_data);
+
+		console.log('created');
 	}
 	async update(github_id: number, data: UpdateUserDTO): Promise<void> {
 		const user_data = DataMapper.updateUser(data);
@@ -34,7 +36,11 @@ export class UserService implements IUserService {
 		});
 
 		if (!userExists) {
-			throw new NotFoundException('User not found');
+			throw new NotFoundException(
+				'Usuário não encontrado',
+				'User not found',
+				'UserService@getUserAuthenticatedData',
+			);
 		}
 
 		await this.userRepository.delete(github_id);
@@ -52,7 +58,11 @@ export class UserService implements IUserService {
 		const data = await this.userRepository.findByGithubId(github_id);
 
 		if (!data) {
-			throw new NotFoundException('User not found');
+			throw new NotFoundException(
+				'Usuário não encontrado',
+				'User not found',
+				'UserService@getUserAuthenticatedData',
+			);
 		}
 
 		return data;

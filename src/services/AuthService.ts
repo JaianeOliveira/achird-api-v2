@@ -46,6 +46,8 @@ export class AuthService implements IAuthService {
 				github_id: user_data.github_id,
 			});
 
+			console.log('AuthService: user_exists', user_exists);
+
 			if (!user_exists) {
 				await this.userService.create(user_data);
 			} else {
